@@ -1,18 +1,30 @@
 import os
 
+from pydantic.types import DirectoryPath
+
+
 def get_files_info(working_directory, directory=""):
+
+
     full_path = os.path.join(working_directory, directory)
 
-    if not full_path.startswith(working_directory):
-        print(f'Error: Cannot list "{directory}" as it is outside the permitted working directory')
+    abs_working = os.path.abspath(working_directory)
+    abs_path = os.path.abspath(full_path)
 
-    if not os.path.isdir(full_path):
-        print(f'Error: "{directory}" is not a directory')
+    current = "current" if directory in ("", ".", None)  else f"'{directory}'"
 
-    for file in os.listdir(full_path):
-        item_path = os.path.join(full_path,file)
-        info = os.stat(item_path)
-        print(f'- {file}: {os.path.getsize(item_path)}, is_dir={os.path.isdir(item_path)} ')
-        
-    
-get_files_info("calculator",".")
+    output = f'Result for {current} directory:\n'
+
+    if not os.path.isdir(abs_working):
+      output +=f'Error: "{abs_working}" is not a directory'
+      return output
+
+    if not abs_path.startswith(abs_working):
+      output += f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
+      return output
+
+    for file in os.listdir(abs_path):
+      if not file.__contains__("pycache"):
+        item_path = os.path.join(abs_path,file)
+        output+=f'- {file}: {os.path.getsize(item_path)}, is_dir={os.path.isdir(item_path)} \n'
+    return output
