@@ -1,9 +1,9 @@
-import os,sys
+import os
+import sys
+
 from dotenv import load_dotenv
 from google import genai
-
 from google.genai import types
-
 
 
 def main ():
@@ -28,8 +28,8 @@ def main ():
         if len(sys.argv)>2:
             if sys.argv[2] == "--verbose":
                 print(f"User prompt: {prompt}")
-                print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-                print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+                # print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+                # print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
     else:
         print("No prompt given")
