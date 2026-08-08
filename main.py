@@ -1,39 +1,50 @@
 import os
 import sys
 
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+from openai import OpenAI
 
 
-def main ():
-
+def main():
     prompt = ""
-    if len(sys.argv)>1:
+    if len(sys.argv) > 1:
         prompt = sys.argv[1]
-        messages = [
-            types.Content(role="user", parts=[types.Part(text=prompt)]),
-        ]
         print(prompt)
-        load_dotenv()
-        api_key = os.environ.get("GEMINI_API_KEY")
-        print(api_key)
-        client = genai.Client(api_key=api_key)
 
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-001',
-            contents=messages
+        # Connect to local LM Studio server
+        client = OpenAI(
+            base_url="http://localhost:1234/v1",
+            api_key="lm-studio",  # Required parameter, but any string works
         )
-        print(response.text)
-        if len(sys.argv)>2:
-            if sys.argv[2] == "--verbose":
-                print(f"User prompt: {prompt}")
-                # print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-                # print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+
+        response = client.chat.completions.create(
+            model="local-model",  # LM Studio routes this to whichever model is loaded
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        prompt_token = ""
+        response_token = ""
+
+        if response and response.choices:
+            print(response.choices[0].message.content)
+            if response.usage:
+                prompt_token = response.usage.prompt_tokens
+                response_token = response.usage.completion_tokens
+        else:
+            print("There were some issues with the response.")
+
+        if len(sys.argv) > 2 and sys.argv[2] == "--verbose":
+            verbose(prompt, prompt_token, response_token)
 
     else:
         print("No prompt given")
+        verbose("", "", "")
         sys.exit(1)
-        return
+
+
+def verbose(prompt, prompt_token, response_token):
+    print(f"User prompt: {prompt}")
+    print(f"Prompt tokens: {prompt_token}")
+    print(f"Response tokens: {response_token}")
+
 
 main()
