@@ -24,7 +24,7 @@ def get_files_info(working_directory, directory=""):
     for file in os.listdir(abs_path):
         if not file.__contains__("pycache"):
             item_path = os.path.join(abs_path, file)
-            output += f"- {file}: {os.path.getsize(item_path)}, is_dir={os.path.isdir(item_path)} \n"
+            output += f"- {file}: file_size={os.path.getsize(item_path)} bytes, is_dir={os.path.isdir(item_path)} \n"
     return output
 
 
