@@ -1,6 +1,5 @@
-import sys
-
 from openai import OpenAI
+import sys
 
 
 def main():
@@ -15,10 +14,14 @@ def main():
             api_key="lm-studio",  # Required parameter, but any string works
         )
 
+
         response = client.chat.completions.create(
             model="local-model",  # LM Studio routes this to whichever model is loaded
             messages=[{"role": "user", "content": prompt}],
         )
+
+
+
 
         prompt_token = ""
         response_token = ""
@@ -38,6 +41,7 @@ def main():
         print("No prompt given")
         verbose("", "", "")
         sys.exit(1)
+
 
 
 def verbose(prompt, prompt_token, response_token):

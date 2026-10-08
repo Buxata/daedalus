@@ -18,6 +18,7 @@ def main():
         result = calculator.evaluate(expression)
         to_print = render(expression, result)
         print(to_print)
+        print(f'"result": {result}')
     except Exception as e:
         print(f"Error: {e}")
 
