@@ -4,7 +4,7 @@ import unittest
 from functions.run_python_file import run_python_file
 
 
-class TestGetFilesInfo(unittest.TestCase):
+class TestRunPythonFile(unittest.TestCase):
     def test_running_no_args(self):
         output = run_python_file("calculator", "main.py")
         self.assertTrue(output.__contains__("Calculator App"))

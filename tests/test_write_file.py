@@ -4,7 +4,7 @@ import unittest
 from functions.write_file import write_file
 
 
-class TestGetFilesInfo(unittest.TestCase):
+class TestWriteFile(unittest.TestCase):
     def test_current_directory(self):
         output = write_file("calculator", "lorem.txt", "wait, this isn't lorem ipsum")
         self.assertTrue(output.startswith("Successfully wrote to "))
