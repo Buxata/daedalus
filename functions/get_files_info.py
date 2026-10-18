@@ -1,6 +1,7 @@
 import os
+from config import DEBUG_VAR
 
-debug_var = True
+debug_var = DEBUG_VAR
 
 def output_handle (output):
     if debug_var:

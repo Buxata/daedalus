@@ -1,7 +1,10 @@
-import sys,json
+import sys
+
 from openai import OpenAI
+
 from etc.prompts import system_prompt
-from etc.call_functions import available_functions
+from etc.utilities import process_request
+
 
 def main():
     prompt = ""
@@ -14,34 +17,29 @@ def main():
             base_url="http://localhost:1234/v1",
             api_key="lm-studio",  # Required parameter, but any string works
         )
-        messages_for_chat = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ]
 
-        response = client.chat.completions.create(
-            model="local-model",  # LM Studio routes this to whichever model is loaded
-            messages=messages_for_chat,
-            temperature=0,
-            tools=available_functions,
-        )
 
+
+        message_history= [{"role": "system", "content": system_prompt}, {"role": "user", "content": prompt}]
         prompt_token = ""
         response_token = ""
 
-        message = response.choices[0].message
-        if message.tool_calls:
-            for tool_call in message.tool_calls:
-                function_args = json.loads(tool_call.function.arguments or "{}")
-                print(f"Calling function: {tool_call.function.name}({function_args})")
+        i = 0
+        while process_request(message_history, prompt_token, response_token, client):
+            if i > 20:
+                sys.exit(1)
+            i = i+1
 
-        if response and response.choices:
-            print(response.choices[0].message.content)
-            if response.usage:
-                prompt_token = response.usage.prompt_tokens
-                response_token = response.usage.completion_tokens
+        for message in message_history:
+            if message.get("content"):
+                print(f"{message["role"]}: {message["content"]}")
+            if message.get("reasoning_content"):
+                print(f"Reasoning...{message["role"]}: {message["reasoning_content"]}")
+
+        if i == 1:
+            print (f"The response was prompted {i} time" )
         else:
-            print("There were some issues with the response.")
+            print (f"The response was prompted {i} times" )
 
         if len(sys.argv) > 2 and sys.argv[2] == "--verbose":
             verbose(prompt, prompt_token, response_token)
@@ -56,6 +54,5 @@ def verbose(prompt, prompt_token, response_token):
     print(f"User prompt: {prompt}")
     print(f"Prompt tokens: {prompt_token}")
     print(f"Response tokens: {response_token}")
-
 
 main()

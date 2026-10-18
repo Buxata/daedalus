@@ -1,5 +1,6 @@
 import os
 
+
 def write_file(working_directory: str, file_path: str, content: str) -> str:
 
     full_path = os.path.join(working_directory, file_path)

@@ -1,7 +1,7 @@
 import os
-from config import MAX_CHARS_TO_READ_FROM_FILE
+from config import MAX_CHARS_TO_READ_FROM_FILE, DEBUG_VAR
 
-debug_var = False
+debug_var = DEBUG_VAR
 
 def output_handle (output):
     if debug_var:
@@ -46,7 +46,7 @@ schema_get_files_content = {
         "parameters": {
             "type": "object",
             "properties": {
-                "file": {
+                "file_path": {
                     "type": "string",
                     "description": "File path to read from, relative to the working directory (default is the working directory itself)",
                 },

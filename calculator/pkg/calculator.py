@@ -38,24 +38,15 @@ class Calculator:
                 try:
                     values.append(float(token))
                 except ValueError:
-                    raise ValueError(f"invalid token: {token}")
+                    raise ValueError(f"Invalid token: {token}")
 
         while operators:
             self._apply_operator(operators, values)
 
-        if len(values) != 1:
-            raise ValueError("invalid expression")
-
-        return values[0]
+        return values[0] if values else None
 
     def _apply_operator(self, operators, values):
-        if not operators:
-            return
-
-        operator = operators.pop()
-        if len(values) < 2:
-            raise ValueError(f"not enough operands for operator {operator}")
-
+        op = operators.pop()
         b = values.pop()
         a = values.pop()
-        values.append(self.operators[operator](a, b))
+        values.append(self.operators[op](a, b))
