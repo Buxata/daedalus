@@ -1,39 +1,58 @@
-import os
 import sys
 
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+from openai import OpenAI
+
+from etc.prompts import system_prompt
+from etc.utilities import process_request
 
 
-def main ():
-
+def main():
     prompt = ""
-    if len(sys.argv)>1:
+    if len(sys.argv) > 1:
         prompt = sys.argv[1]
-        messages = [
-            types.Content(role="user", parts=[types.Part(text=prompt)]),
-        ]
         print(prompt)
-        load_dotenv()
-        api_key = os.environ.get("GEMINI_API_KEY")
-        print(api_key)
-        client = genai.Client(api_key=api_key)
 
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-001',
-            contents=messages
+        # Connect to local LM Studio server
+        client = OpenAI(
+            base_url="http://localhost:1234/v1",
+            api_key="lm-studio",  # Required parameter, but any string works
         )
-        print(response.text)
-        if len(sys.argv)>2:
-            if sys.argv[2] == "--verbose":
-                print(f"User prompt: {prompt}")
-                # print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-                # print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+
+
+
+        message_history= [{"role": "system", "content": system_prompt}, {"role": "user", "content": prompt}]
+        prompt_token = ""
+        response_token = ""
+
+        i = 0
+        while process_request(message_history, prompt_token, response_token, client):
+            if i > 20:
+                sys.exit(1)
+            i = i+1
+
+        for message in message_history:
+            if message.get("content"):
+                print(f"{message["role"]}: {message["content"]}")
+            if message.get("reasoning_content"):
+                print(f"Reasoning...{message["role"]}: {message["reasoning_content"]}")
+
+        if i == 1:
+            print (f"The response was prompted {i} time" )
+        else:
+            print (f"The response was prompted {i} times" )
+
+        if len(sys.argv) > 2 and sys.argv[2] == "--verbose":
+            verbose(prompt, prompt_token, response_token)
 
     else:
         print("No prompt given")
+        verbose("", "", "")
         sys.exit(1)
-        return
+
+
+def verbose(prompt, prompt_token, response_token):
+    print(f"User prompt: {prompt}")
+    print(f"Prompt tokens: {prompt_token}")
+    print(f"Response tokens: {response_token}")
 
 main()

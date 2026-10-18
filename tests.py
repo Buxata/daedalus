@@ -1,38 +1,17 @@
-import os
+import sys
 import unittest
 
-from functions.get_files_info import get_files_info
+def run_all_tests():
+    # Discover and run all test files matching "test*.py" in the "tests" directory
+    loader = unittest.TestLoader()
+    suite = loader.discover(start_dir="tests", pattern="test*.py")
 
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
 
-class TestGetFilesInfoBegins(unittest.TestCase):
+    # Return exit code 1 if any tests failed or errored so subprocess/CI picks it up
+    if not result.wasSuccessful():
+        sys.exit(1)
 
-
-    def test_current_directory_begin(self):
-        output = get_files_info("calculator", ".")
-        self.assertTrue(output.startswith("Result for current directory:"))
-        print(output)
-
-
-    def test_subdirectory_begin(self):
-        output = get_files_info("calculator", "pkg")
-        self.assertTrue(output.startswith("Result for 'pkg' directory:"))
-        print(output)
-
-    def test_absolute_path_outside_begin(self):
-        output = get_files_info("calculator", "/bin")
-        self.assertTrue(output.startswith("Result for '/bin' directory:"))
-        print(output)
-
-    def test_parent_directory_begin(self):
-        output = get_files_info("calculator", "../")
-        self.assertTrue(output.startswith("Result for '../' directory:"))
-        print(output)
-
-    def test_calculators_parent_not_directory_begin(self):
-        output = get_files_info("calculators","../")
-        self.assertTrue(output.startswith("Result for '../' directory:"))
-        print(output)
-
-
-if __name__ == '__main__':
-    unittest.main()
+if __name__ == "__main__":
+    run_all_tests()
